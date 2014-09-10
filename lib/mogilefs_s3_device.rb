@@ -1,5 +1,4 @@
-require "mogilefs_s3_device/version"
+# -*- encoding: utf-8; -*-
 
-module MogilefsS3Device
-  # Your code goes here...
-end
+require 'mogilefs_s3_device/usage_handler'
+require 'mogilefs_s3_device/version'
