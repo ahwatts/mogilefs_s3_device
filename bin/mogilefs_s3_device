@@ -1,0 +1,3 @@
+#!/usr/bin/env ruby
+
+require 'mogilefs_s3_device'
