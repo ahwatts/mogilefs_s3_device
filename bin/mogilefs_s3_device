@@ -1,3 +1,6 @@
 #!/usr/bin/env ruby
 
-require 'mogilefs_s3_device'
+rackup = File.expand_path("../../rackup.ru", __FILE__)
+command_line = "bundle exec thin -R #{rackup} #{ARGV.join(' ')} start"
+$stderr.puts "+ #{command_line}"
+exec command_line
