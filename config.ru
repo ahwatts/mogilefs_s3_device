@@ -17,5 +17,5 @@ AWS.config({
 use MogilefsS3Device::Cleanup
 use Rack::Lint
 use Rack::Logger, Logger::DEBUG
-use Rack::CommonLogger
+# use Rack::CommonLogger
 run MogilefsS3Device::Handler.new
