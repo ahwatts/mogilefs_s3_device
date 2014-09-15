@@ -2,7 +2,7 @@
 
 $LOAD_PATH << File.expand_path("../lib", __FILE__)
 require 'mogilefs_s3_device'
-require 'dav4rack'
+# require 'dav4rack'
 require 'logger'
 require 'aws-sdk'
 
@@ -15,12 +15,15 @@ AWS.config({
     logger: MogilefsS3Device.logger
   })
 
-# use Rack::Lint
+use MogilefsS3Device::Cleanup
+use Rack::Lint
 use Rack::Logger, Logger::DEBUG
 use Rack::CommonLogger
-# use MogilefsS3Device::Cleanup
-use MogilefsS3Device::UsageHandler
-run DAV4Rack::Handler.new({
-    resource_class: MogilefsS3Device::S3Resource,
-    log_to: MogilefsS3Device.logger
-  })
+run MogilefsS3Device::Handler.new
+
+# run DAV4Rack::Handler.new(root: File.expand_path("../public/files", __FILE__))
+
+# run DAV4Rack::Handler.new({
+#     resource_class: MogilefsS3Device::S3Resource,
+#     log_to: MogilefsS3Device.logger
+#   })
