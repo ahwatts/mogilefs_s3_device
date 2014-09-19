@@ -12,7 +12,6 @@ module MogilefsS3Device
     def initialize(env)
       super(env)
       @key = MogilefsS3Device.prefix + request.path_info
-      # @local_path = File.expand_path("../../../public#{request.path_info}", __FILE__)
       @local_path = File.join("/tmp/mogilefs_s3_device", request.path_info)
     end
 
@@ -26,11 +25,6 @@ module MogilefsS3Device
     alias_method :head, :get
 
     def put
-      # object.write(request.body.read, content_type: request.content_type)
-      # object.write(content_type: request.content_type, content_length: request.content_length.to_i) do |buffer, bytes|
-      #   buffer.write(request.body.read(bytes))
-      # end
-
       # Buffer the file to disk so we can get a proper content-type
       # for it and so that we're not buffering the whole file in to
       # memory.
