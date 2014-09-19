@@ -37,10 +37,22 @@ module MogilefsS3Device
         end
       end
 
-      # Now upload it to S3.
+      # Figure out some metadata about the file.
       content_type = `file -bi '#{@local_path}'`.chomp
+      domain, mog_key = mogilefs_domain_and_key
+      obj_meta =
+        if domain && mog_key
+          { "mogilefs-domain" => domain,
+            "mogilefs-key" => mog_key, }
+        else
+          {}
+        end
+
+      # Now upload it to S3.
       File.open(@local_path, "rb") do |f|
-        object.write(f, content_type: content_type)
+        object.write(f,
+          content_type: content_type,
+          metadata: obj_meta)
       end
       File.delete(@local_path)
 
@@ -58,6 +70,26 @@ module MogilefsS3Device
 
     def mkcol
       bad_request
+    end
+
+    protected
+
+    def mogilefs_domain_and_key
+      begin
+        conn = MogilefsS3Device.db_conn
+        fid = File.basename(request.path_info, ".fid").to_i
+        sql = "SELECT f.dkey, d.namespace FROM file f, domain d WHERE d.dmid = f.dmid AND f.fid = #{Mysql2::Client.escape(fid.to_s)}"
+        logger.debug("Getting key for fid #{fid.inspect}: #{sql}")
+        result = conn.query(sql)
+        if result.count >= 1
+          [ result.first["namespace"], result.first["dkey"] ]
+        else
+          [ nil, nil ]
+        end
+      rescue
+        MogilefsS3Device.log_error
+        [ nil, nil ]
+      end
     end
   end
 end

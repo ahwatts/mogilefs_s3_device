@@ -18,19 +18,7 @@ module MogilefsS3Device
           error
         end
       rescue
-        msg = StringIO.new
-        msg.puts("Error handling request %p %p: %s (%p):\n\t%s" %
-          [ request.request_method, request.path_info, $!.message,
-            $!.class, $!.backtrace.join("\n\t") ])
-
-        c = $!.cause
-        while c
-          msg.puts("Caused by: %s (%p):\n\t%s" %
-            [ c.message, c.class, c.backtrace.join("\n\t") ])
-          c = c.cause
-        end
-
-        logger.error(msg.string)
+        MogilefsS3Device.log_error
         error
       end
 
