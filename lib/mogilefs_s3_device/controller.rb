@@ -18,7 +18,7 @@ module MogilefsS3Device
           error
         end
       rescue
-        MogilefsS3Device.log_error
+        MogilefsS3Device.log_error(request)
         error
       end
 

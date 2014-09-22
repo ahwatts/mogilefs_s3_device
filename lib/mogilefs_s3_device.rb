@@ -18,7 +18,7 @@ module MogilefsS3Device
       @db_conn ||= Mysql2::Client.new(self.db_settings)
     end
 
-    def log_error(exception = $!)
+    def log_error(request, exception = $!)
       msg = StringIO.new
       msg.puts("Error handling request %p %p: %s (%p):\n\t%s" %
         [ request.request_method, request.path_info,
