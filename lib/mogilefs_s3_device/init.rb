@@ -85,11 +85,7 @@ MogilefsS3Device.db_settings = {
 end
 
 AWS.config({
-    access_key_id: ENV['SEC_AMAZON_S3_ACCESS_KEY'],
-    secret_access_key: ENV['SEC_AMAZON_S3_ACCESS_SECRET_KEY'],
+    access_key_id: ENV['SEC_MOGILEFS_BACKUP_AMAZON_S3_ACCESS_KEY'],
+    secret_access_key: ENV['SEC_MOGILEFS_BACKUP_AMAZON_S3_ACCESS_SECRET_KEY'],
     logger: MogilefsS3Device.logger
   })
-
-p MogilefsS3Device.bucket
-p MogilefsS3Device.prefix
-p MogilefsS3Device.db_settings
