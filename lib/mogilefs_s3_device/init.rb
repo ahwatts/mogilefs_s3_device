@@ -9,7 +9,6 @@ require 'yaml'
 
 # Utility.
 def parse_dsn(dsn)
-  puts "dsn = #{dsn.inspect}"
   _, _, opts = dsn.split(":")
   opts = Hash[opts.split(";").map { |o| o.split("=") }]
 
