@@ -1,32 +1,22 @@
 #!/usr/bin/env ruby
 
-require 'optparse'
-
 # Capture the Unicorn config file parameter and set it to a default here.
 rackup = File.expand_path("../../config.ru", __FILE__)
 unicorn_config = "/etc/mogilefs/mogilefs_s3_device_unicorn.rb"
+unicorn_args = []
 
-ARGV.options do |o|
-  o.banner = "Usage: #{File.basename(__FILE__)} [options] [unicorn options]"
-  o.separator ""
-  o.separator "The following options will be passed to Unicorn unless specified here:"
-  o.separator "  --config-file #{unicorn_config}"
-  o.separator "  rackup config file: #{rackup}"
-  o.separator ""
-
-  o.on("-c", "--config-file FILE", "Unicorn config file") do |c|
-    unicorn_config = c
+loop do
+  arg = ARGV.shift
+  if arg == "-c" || arg == "--config-file"
+    unicorn_config = ARGV.shift
+  elsif arg.nil?
+    break
+  else
+    unicorn_args.push arg
   end
-
-  o.on("-h", "--help") do
-    puts o
-    exit(1)
-  end
-
-  o.parse!
 end
 
 # Run unicorn with the remainder of the arguments.
-command_line = "unicorn -c #{unicorn_config} #{ARGV.join(' ')} #{rackup}"
+command_line = "unicorn -c #{unicorn_config} #{unicorn_args.join(' ')} #{rackup}"
 $stderr.puts "+ #{command_line}"
 exec command_line
