@@ -87,7 +87,7 @@ module MogilefsS3Device
           [ nil, nil ]
         end
       rescue
-        MogilefsS3Device.log_error
+        MogilefsS3Device.log_error(request)
         [ nil, nil ]
       end
     end
