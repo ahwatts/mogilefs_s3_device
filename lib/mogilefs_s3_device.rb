@@ -12,7 +12,7 @@ require 'mysql2'
 
 module MogilefsS3Device
   class << self
-    attr_accessor :logger, :bucket, :prefix, :db_settings, :db_conn
+    attr_accessor :logger, :bucket, :prefix, :db_settings, :db_conn, :free_space
 
     def db_conn
       @db_conn ||= Mysql2::Client.new(self.db_settings)

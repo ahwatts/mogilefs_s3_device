@@ -5,19 +5,24 @@ require 'mogilefs_s3_device/controller'
 module MogilefsS3Device
   class UsageStats < Controller
     def get
+      free = MogilefsS3Device.free_space
+      total = 100 * free
+      used = 99 * free
+
       # Fake usage data.
       usage_data = {
-        available: 259056232,
+        time: Time.now.to_i,
         device: "/dev/mapper/fedora_wingedlizard-home",
         disk: "/home/awatts/rubydev/workspace/shared/mogdata/dev2",
-        time: 1410379593,
-        total: 399027440,
-        use: "36%",
-        used: 139969504
+        total: total,
+        used: used,
+        available: free,
+        use: "99%",
       }
 
       response["Content-Type"] = "text/plain"
-      response.body << usage_data.map { |k, v| "#{k}: #{v}" }.join("\n") + "\n"
+      text = usage_data.map { |k, v| "#{k}: #{v}" }.join("\n") + "\n"
+      response.body << text
     end
   end
 end

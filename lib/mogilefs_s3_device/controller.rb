@@ -20,6 +20,10 @@ module MogilefsS3Device
       rescue
         MogilefsS3Device.log_error(request)
         error
+      ensure
+        if respond_to?(:reset_cached_s3_data)
+          reset_cached_s3_data
+        end
       end
 
       response.finish
