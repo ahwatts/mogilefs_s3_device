@@ -32,6 +32,7 @@ options = {
   "bucket" => "reverbnation-songs-development",
   "prefix" => "mogilefs-backup",
   "log_file" => STDOUT,
+  "free_space" => (1024**2) * 20, # 20 GiB, in KiB.
 }
 
 if File.exist?(options_file)
@@ -41,6 +42,7 @@ end
 MogilefsS3Device.logger = Logger.new(options["log_file"])
 MogilefsS3Device.bucket = options["bucket"]
 MogilefsS3Device.prefix = options["prefix"]
+MogilefsS3Device.free_space = options["free_space"].to_i
 
 # Set the MogileFS database settings from the mogilefs config.
 MogilefsS3Device.db_settings = {
