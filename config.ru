@@ -6,8 +6,7 @@ require 'mogilefs_s3_device'
 require 'mogilefs_s3_device/init'
 
 use MogilefsS3Device::Cleanup
-use Rack::Lint
-use Rack::Logger, Logger::DEBUG
+use Rack::Logger, Logger::INFO
 
 unless defined?(Unicorn)
   use Rack::CommonLogger

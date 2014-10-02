@@ -76,11 +76,14 @@ module MogilefsS3Device
 
     def mogilefs_domain_and_key
       begin
-        conn = MogilefsS3Device.db_conn
         fid = File.basename(request.path_info, ".fid").to_i
         sql = "SELECT f.dkey, d.namespace FROM file f, domain d WHERE d.dmid = f.dmid AND f.fid = #{Mysql2::Client.escape(fid.to_s)}"
         logger.debug("Getting key for fid #{fid.inspect}: #{sql}")
-        result = conn.query(sql)
+
+        result = MogilefsS3Device.db_conn.with do |conn|
+          conn.query(sql)
+        end
+
         if result.count >= 1
           [ result.first["namespace"], result.first["dkey"] ]
         else

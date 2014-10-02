@@ -46,7 +46,9 @@ module MogilefsS3Device
       end
     end
 
-    def store_to_object(io, content_type: 'application/octet-stream', content_length:)
+    def store_to_object(io, options = {}) # content_type: 'application/octet-stream', content_length:)
+      content_type = options[:content_type] || 'application/octet-stream'
+      content_length = options[:content_length].to_i
       object.write(io.read, content_type: content_type, content_length: content_length)
     end
   end
