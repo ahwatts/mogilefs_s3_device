@@ -2,21 +2,50 @@
 
 # Capture the Unicorn config file parameter and set it to a default here.
 rackup = File.expand_path("../../config.ru", __FILE__)
-unicorn_config = "/etc/mogilefs/mogilefs_s3_device_unicorn.rb"
-unicorn_args = []
 
-loop do
-  arg = ARGV.shift
-  if arg == "-c" || arg == "--config-file"
-    unicorn_config = ARGV.shift
-  elsif arg.nil?
-    break
-  else
-    unicorn_args.push arg
+# Get the choice of server software.
+server = ARGV.shift
+command_line = nil
+
+if server == "puma"
+  puma_config = "/etc/mogilefs/mogilefs_s3_puma.rb"
+  puma_args = []
+
+  loop do
+    arg = ARGV.shift
+    if arg == "-C" || arg == "--config"
+      puma_config = ARGV.shift
+    elsif arg.nil?
+      break
+    else
+      puma_args.push arg
+    end
   end
+
+  # Run unicorn with the remainder of the arguments.
+  command_line = "puma -C #{puma_config} #{puma_args.join(' ')} #{rackup}"
+else
+  if server != "unicorn"
+    ARGV.unshift server
+  end
+
+  unicorn_config = "/etc/mogilefs/mogilefs_s3_device_unicorn.rb"
+  unicorn_args = []
+
+  loop do
+    arg = ARGV.shift
+    if arg == "-c" || arg == "--config-file"
+      unicorn_config = ARGV.shift
+    elsif arg.nil?
+      break
+    else
+      unicorn_args.push arg
+    end
+  end
+
+  # Run unicorn with the remainder of the arguments.
+  command_line = "unicorn -c #{unicorn_config} #{unicorn_args.join(' ')} #{rackup}"
 end
 
-# Run unicorn with the remainder of the arguments.
-command_line = "unicorn -c #{unicorn_config} #{unicorn_args.join(' ')} #{rackup}"
 $stderr.puts "+ #{command_line}"
 exec command_line

@@ -35,6 +35,12 @@ options = {
   "free_space" => (1024**2) * 20, # 20 GiB, in KiB.
 }
 
+if defined?(::Puma) && Puma.cli_config && Puma.cli_config.options[:daemon]
+  options["log_file"] = "log/mogilefs_s3_device.log"
+elsif defined?(::Unicorn) && Unicorn::Configurator::RACKUP[:daemonized]
+  options["log_file"] = "log/mogilefs_s3_device.log"
+end
+
 if File.exist?(options_file)
   File.open(options_file, "rb") { |f| options.merge!(YAML.load(f.read)) }
 end

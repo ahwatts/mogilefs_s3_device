@@ -2,6 +2,7 @@
 
 listen 4000
 worker_processes 8
+pid "tmp/pids/unicorn.pid"
 
 before_fork do |server, worker|
   # Single server rolling reaper.
@@ -20,4 +21,9 @@ before_fork do |server, worker|
   end
 
   sleep 1 # Time between each new worker thread start (single thread warmup period)
+end
+
+if RACKUP[:daemonized]
+  stdout_path "log/mogilefs_s3_device.log"
+  stderr_path "log/mogilefs_s3_device.log"
 end
