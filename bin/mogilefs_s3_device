@@ -8,7 +8,7 @@ server = ARGV.shift
 command_line = nil
 
 if server == "puma"
-  puma_config = "/etc/mogilefs/mogilefs_s3_puma.rb"
+  puma_config = "/etc/mogilefs/mogilefs_s3_device_puma.rb"
   puma_args = []
 
   loop do
