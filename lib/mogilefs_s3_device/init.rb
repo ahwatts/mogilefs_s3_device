@@ -45,10 +45,17 @@ if File.exist?(options_file)
   File.open(options_file, "rb") { |f| options.merge!(YAML.load(f.read)) }
 end
 
+MogilefsS3Device.environment = ENV["MFSS3DEVICE_ENV"] || "development"
 MogilefsS3Device.logger = Logger.new(options["log_file"])
 MogilefsS3Device.bucket = options["bucket"]
 MogilefsS3Device.prefix = options["prefix"]
 MogilefsS3Device.free_space = options["free_space"].to_i
+
+if MogilefsS3Device.environment == "development"
+  MogilefsS3Device.logger.level = Logger::DEBUG
+else
+  MogilefsS3Device.logger.level = Logger::WARN
+end
 
 # Set the MogileFS database settings from the mogilefs config.
 MogilefsS3Device.db_settings = {
@@ -97,8 +104,16 @@ AWS.config({
     logger: MogilefsS3Device.logger
   })
 
-# p MogilefsS3Device.bucket
-# p MogilefsS3Device.prefix
-# p MogilefsS3Device.db_settings
-# p AWS.config.access_key_id
-# p AWS.config.secret_access_key
+# Honeybadger.
+begin
+  require 'honeybadger'
+  Honeybadger.configure do |config|
+    config.api_key = ENV['SEC_MOGILEFS_BACKUP_HONEYBADGER_API_KEY']
+    config.params_filters << 'RAW_POST_DATA'
+    config.development_environments = [ "development", nil ]
+    config.logger = MogilefsS3Device.logger
+    config.environment_name = MogilefsS3Device.environment
+  end
+rescue LoadError
+  MogilefsS3Device.logger.warn("Honeybadger gem not available, not logging exceptions remotely: #{$!.message}")
+end

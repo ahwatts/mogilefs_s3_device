@@ -13,11 +13,23 @@ require 'mysql2'
 
 module MogilefsS3Device
   class << self
-    attr_accessor :logger, :bucket, :prefix, :db_settings, :db_conn_pool, :free_space
+    attr_accessor(:logger, :bucket, :prefix, :db_settings, :db_conn_pool,
+      :free_space, :environment)
 
     def db_conn
       @db_conn_pool ||= ConnectionPool.new(size: 4, timeout: 2) do
         Mysql2::Client.new(self.db_settings)
+      end
+    end
+
+    # Paper over a difference in API between Rubinius and MRI.
+    def exception_cause(ex)
+      if ex.respond_to?(:cause)
+        ex.cause
+      elsif ex.respond_to?(:parent)
+        ex.parent
+      else
+        nil
       end
     end
 
@@ -29,7 +41,7 @@ module MogilefsS3Device
           exception.backtrace.join("\n\t") ])
 
       if exception.respond_to?(:cause)
-        c = exception.cause
+        c = exception_cause(exception)
         while c
           msg.puts("Caused by: %s (%p):\n\t%s" %
             [ c.message, c.class, c.backtrace.join("\n\t") ])
@@ -38,6 +50,18 @@ module MogilefsS3Device
       end
 
       logger.error(msg.string)
+      log_error_to_remote(request, exception)
+    end
+
+    def log_error_to_remote(request, exception)
+      if defined?(::Honeybadger) && !Honeybadger.configuration.api_key.nil?
+        Honeybadger.notify_or_ignore(exception, {
+            rack_env: request.env,
+            environment_name: ENV["RACK_ENV"]
+          })
+      else
+        logger.debug("Honeybadger not configured, not sending exception there.")
+      end
     end
   end
 end
