@@ -55,6 +55,9 @@ MogilefsS3Device.logger = Logger.new(options["log_file"])
 MogilefsS3Device.bucket = options["bucket"]
 MogilefsS3Device.prefix = options["prefix"]
 MogilefsS3Device.free_space = options["free_space"].to_i
+MogilefsS3Device.statsd_host = options["statsd_host"]
+MogilefsS3Device.statsd_port = options["statsd_port"].to_i
+MogilefsS3Device.statsd_prefix = options["statsd_prefix"]
 
 # Configure the logger.
 if MogilefsS3Device.environment == "development"
@@ -108,7 +111,7 @@ end
 AWS.config({
     access_key_id: ENV['SEC_MOGILEFS_BACKUP_AWS_ACCESS_KEY_ID'],
     secret_access_key: ENV['SEC_MOGILEFS_BACKUP_AWS_SECRET_ACCESS_KEY'],
-    logger: MogilefsS3Device.logger
+    logger: MogilefsS3Device.logger,
   })
 
 # Honeybadger.
@@ -123,4 +126,12 @@ begin
   end
 rescue LoadError
   MogilefsS3Device.logger.warn("Honeybadger gem not available, not logging exceptions remotely: #{$!.message}")
+end
+
+# Statsd.
+begin
+  require 'statsd'
+  Statsd.logger = MogilefsS3Device.logger
+rescue LoadError
+  MogilefsS3Device.logger.warn("Statsd-ruby gem not available, not recording stats: #{$!.message}")
 end

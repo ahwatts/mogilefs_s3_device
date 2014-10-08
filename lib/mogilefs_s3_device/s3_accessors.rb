@@ -1,13 +1,29 @@
 # -*- encoding: utf-8; -*-
 
 require 'aws-sdk'
+require 'forwardable'
 
 module MogilefsS3Device
+  class StatsdHttpHandler
+    extend Forwardable
+
+    def_delegators :@handler, :pool
+
+    def initialize(real_handler)
+      @handler = real_handler
+    end
+
+    def handle(*args)
+      @handler.handle(*args)
+      MogilefsS3Device.record_stat("s3_ops", :c)
+    end
+  end
+
   module S3Accessors
     attr_accessor :s3, :bucket, :key, :object, :metadata
 
     def s3
-      @s3 ||= AWS::S3.new
+      @s3 || AWS::S3.new(http_handler: StatsdHttpHandler.new(AWS.config.http_handler))
     end
 
     def bucket
