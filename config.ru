@@ -6,8 +6,9 @@ require 'mogilefs_s3_device'
 require 'mogilefs_s3_device/init'
 
 use MogilefsS3Device::Cleanup
-use Rack::Logger
+use Rack::Logger, Logger::INFO
 
+# Unicorn helpfully includes the Rack::CommonLogger middleware for us.
 unless defined?(Unicorn)
   use Rack::CommonLogger
 end

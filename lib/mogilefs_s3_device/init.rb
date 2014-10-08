@@ -26,31 +26,37 @@ def parse_dsn(dsn)
   rv
 end
 
-# Set the options for this daemon.
+# Set the default options for this daemon.
 options_file = "/etc/mogilefs/mogilefs_s3_device.yml"
 options = {
   "bucket" => "reverbnation-songs-development",
   "prefix" => "mogilefs-backup",
   "log_file" => STDOUT,
   "free_space" => (1024**2) * 20, # 20 GiB, in KiB.
+  "environment" => "development",
 }
 
+# If we're going to be daemonized, don't use stdout as the default log
+# destination.
 if defined?(::Puma) && Puma.cli_config && Puma.cli_config.options[:daemon]
   options["log_file"] = "log/mogilefs_s3_device.log"
 elsif defined?(::Unicorn) && Unicorn::Configurator::RACKUP[:daemonized]
   options["log_file"] = "log/mogilefs_s3_device.log"
 end
 
+# Load the config file.
 if File.exist?(options_file)
   File.open(options_file, "rb") { |f| options.merge!(YAML.load(f.read)) }
 end
 
-MogilefsS3Device.environment = ENV["MFSS3DEVICE_ENV"] || "development"
+# Set the options from the config
+MogilefsS3Device.environment = ENV["MFSS3DEVICE_ENV"] || options["environment"] || "development"
 MogilefsS3Device.logger = Logger.new(options["log_file"])
 MogilefsS3Device.bucket = options["bucket"]
 MogilefsS3Device.prefix = options["prefix"]
 MogilefsS3Device.free_space = options["free_space"].to_i
 
+# Configure the logger.
 if MogilefsS3Device.environment == "development"
   MogilefsS3Device.logger.level = Logger::DEBUG
 else
@@ -98,6 +104,7 @@ MogilefsS3Device.db_settings = {
   end
 end
 
+# Configure AWS
 AWS.config({
     access_key_id: ENV['SEC_MOGILEFS_BACKUP_AWS_ACCESS_KEY_ID'],
     secret_access_key: ENV['SEC_MOGILEFS_BACKUP_AWS_SECRET_ACCESS_KEY'],
