@@ -1,7 +1,14 @@
 # -*- mode: ruby; encoding: utf-8; -*-
 
 require 'rubygems'
-require 'bundler/setup'
+
+# Make sure we're using the version of the gem that came along with
+# this config.ru file.
+lib_path = File.expand_path("../lib", __FILE__)
+unless $:.include?(lib_path)
+  $:.unshift(lib_path)
+end
+
 require 'mogilefs_s3_device'
 require 'mogilefs_s3_device/init'
 
