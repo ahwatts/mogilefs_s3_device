@@ -37,7 +37,7 @@ module MogilefsS3Device
         end
 
       end_time = Time.now
-      MogilefsS3Device.record_stat("#{handler}.#{response.first.to_i.to_s}.response_time", :t, end_time - start_time)
+      MogilefsS3Device.record_stat("handlers.#{handler}.#{response.first.to_i.to_s}.response_time", :t, end_time - start_time)
 
       response
     end
