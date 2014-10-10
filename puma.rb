@@ -2,11 +2,11 @@
 
 bind "tcp://0.0.0.0:4000"
 threads 1, 16
-pidfile "tmp/pids/puma.pid"
+pidfile File.expand_path("../tmp/pids/puma.pid", __FILE__)
 
 if @options[:daemon]
   stdout_redirect(
-    "log/mogilefs_s3_device.log",
-    "log/mogilefs_s3_device.log",
+    File.expand_path("../log/mogilefs_s3_device.log", __FILE__),
+    File.expand_path("../log/mogilefs_s3_device.log", __FILE__),
     true)
 end

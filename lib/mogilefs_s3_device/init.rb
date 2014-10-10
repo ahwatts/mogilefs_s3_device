@@ -39,9 +39,9 @@ options = {
 # If we're going to be daemonized, don't use stdout as the default log
 # destination.
 if defined?(::Puma) && Puma.cli_config && Puma.cli_config.options[:daemon]
-  options["log_file"] = "log/mogilefs_s3_device.log"
+  options["log_file"] = File.expand_path("../../../log/mogilefs_s3_device.log", __FILE__)
 elsif defined?(::Unicorn) && Unicorn::Configurator::RACKUP[:daemonized]
-  options["log_file"] = "log/mogilefs_s3_device.log"
+  options["log_file"] = File.expand_path("../../../log/mogilefs_s3_device.log", __FILE__)
 end
 
 # Load the config file.
