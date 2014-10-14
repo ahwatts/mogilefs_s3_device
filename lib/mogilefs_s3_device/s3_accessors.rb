@@ -29,7 +29,7 @@ module MogilefsS3Device
         MogilefsS3Device.record_stat("s3_ops.up_bytes", :c, up_bytes)
       end
 
-      if down_bytes > 0
+      if down_bytes > 0 && request.http_method != "HEAD"
         MogilefsS3Device.record_stat("s3_ops.down_bytes", :c, down_bytes)
       end
 
