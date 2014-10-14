@@ -1,5 +1,6 @@
 # -*- encoding: utf-8; -*-
 
+require 'time'
 require 'aws-sdk'
 require 'forwardable'
 
@@ -13,9 +14,30 @@ module MogilefsS3Device
       @handler = real_handler
     end
 
-    def handle(*args)
-      @handler.handle(*args)
-      MogilefsS3Device.record_stat("s3_ops", :c)
+    def handle(request, response, &read_block)
+      start_time = Time.now
+      rv = @handler.handle(request, response, &read_block)
+      end_time = Time.now
+
+      up_bytes = request.headers["content-length"].to_i
+      down_bytes = (response.headers["content-length"] || [ "0" ]).first.to_i
+
+      MogilefsS3Device.record_stat("s3_ops.response_time", :t, ((end_time - start_time)*1000).round)
+      MogilefsS3Device.record_stat("s3_ops.#{request.http_method}.#{response.status}", :c)
+
+      if up_bytes > 0
+        MogilefsS3Device.record_stat("s3_ops.up_bytes", :c, up_bytes)
+      end
+
+      if down_bytes > 0
+        MogilefsS3Device.record_stat("s3_ops.down_bytes", :c, down_bytes)
+      end
+
+      rv
+    end
+
+    def logger
+      MogilefsS3Device.logger
     end
   end
 

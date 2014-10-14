@@ -107,7 +107,7 @@ module MogilefsS3Device
 
         case type
         when :counter, :c
-          @statsd.increment(full_name)
+          @statsd.increment(full_name, (value || 1).to_i)
         when :timing, :t
           @statsd.timing(full_name, value.to_i)
         when :gauge, :g
