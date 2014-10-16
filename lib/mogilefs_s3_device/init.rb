@@ -123,6 +123,11 @@ begin
     config.development_environments = [ "development", nil ]
     config.logger = MogilefsS3Device.logger
     config.environment_name = MogilefsS3Device.environment
+    config.ignore_by_filter do |exception_data|
+      %w{ AWS::S3::Errors::SignatureDoesNotMatch
+          AWS::S3::Errors::Forbidden }
+        .any? { |cn| exception_data[:error_class] == cn }
+    end
   end
 rescue LoadError
   MogilefsS3Device.logger.warn("Honeybadger gem not available, not logging exceptions remotely: #{$!.message}")

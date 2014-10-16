@@ -104,7 +104,6 @@ module MogilefsS3Device
             "all.#{name}"
           end
 
-
         case type
         when :counter, :c
           if value
