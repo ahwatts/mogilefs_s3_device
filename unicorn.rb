@@ -11,16 +11,15 @@ before_fork do |server, worker|
   # 3. Repeat until all old workers are dead
   # 4. Reap old master
   old_pid = "#{server.config[:pid]}.oldbin"
-  if old_pid != server.pid
+  if File.exist?(old_pid) && old_pid != server.pid
     begin
       sig = (worker.nr + 1) >= server.worker_processes ? :QUIT : :TTOU
       Process.kill(sig, File.read(old_pid).to_i)
     rescue Errno::ENOENT, Errno::ESRCH
       # someone else did our job for us
     end
+    sleep 1 # Time between each new worker thread start (single thread warmup period)
   end
-
-  sleep 1 # Time between each new worker thread start (single thread warmup period)
 end
 
 if RACKUP[:daemonized]
