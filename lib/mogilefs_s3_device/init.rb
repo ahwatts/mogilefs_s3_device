@@ -108,11 +108,18 @@ MogilefsS3Device.db_settings = {
 end
 
 # Configure AWS
-AWS.config({
-    access_key_id: ENV['SEC_MOGILEFS_BACKUP_AWS_ACCESS_KEY_ID'],
-    secret_access_key: ENV['SEC_MOGILEFS_BACKUP_AWS_SECRET_ACCESS_KEY'],
-    logger: MogilefsS3Device.logger,
-  })
+if ENV["SEC_MOGILEFS_BACKUP_AWS_ACCESS_KEY_ID"] && ENV["SEC_MOGILEFS_BACKUP_AWS_SECRET_ACCESS_KEY"]
+  AWS.config({
+      access_key_id: ENV['SEC_MOGILEFS_BACKUP_AWS_ACCESS_KEY_ID'],
+      secret_access_key: ENV['SEC_MOGILEFS_BACKUP_AWS_SECRET_ACCESS_KEY'],
+      logger: MogilefsS3Device.logger,
+    })
+else
+  AWS.config({
+      credential_provider: AWS::Core::CredentialProviders::SharedCredentialFileProvider.new(profile_name: "mogilefs_s3_device"),
+      logger: MogilefsS3Device.logger,
+    })
+end
 
 # Honeybadger.
 begin
