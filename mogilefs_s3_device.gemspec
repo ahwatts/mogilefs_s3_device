@@ -26,7 +26,7 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency "bundler", "~> 1.6"
   spec.add_development_dependency "gemfury"
-  spec.add_development_dependency "honeybadger"
+  spec.add_development_dependency "honeybadger", "~> 1.16"
   spec.add_development_dependency "minitest"
   spec.add_development_dependency "pry"
   spec.add_development_dependency "rake"
