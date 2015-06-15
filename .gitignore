@@ -20,3 +20,4 @@ test/version_tmp
 *.a
 mkmf.log
 /log/*.log
+/tmp/pids/unicorn.pid
