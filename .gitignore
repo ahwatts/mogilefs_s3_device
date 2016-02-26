@@ -21,3 +21,5 @@ test/version_tmp
 mkmf.log
 /log/*.log
 /tmp/pids/unicorn.pid
+/.ruby-version
+/.ruby-gemset
