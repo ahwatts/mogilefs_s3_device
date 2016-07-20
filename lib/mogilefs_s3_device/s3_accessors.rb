@@ -77,7 +77,7 @@ module MogilefsS3Device
       response["Content-Length"] = metadata[:content_length].to_s
       response["Content-Type"] = metadata[:content_type]
       response["ETag"] = metadata[:etag]
-      response["Last-Modified"] = metadata[:last_modified].rfc2822
+      response["Last-Modified"] = metadata[:last_modified].httpdate
       unless request.request_method == 'HEAD'
         # Yikes.
         response.body = [ object.read ]
